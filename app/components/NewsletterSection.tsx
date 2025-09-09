@@ -13,6 +13,7 @@ const DICT: Record<
     fb: string
     ig: string
     hours: { monfri: string; sat: string; sun: string }
+    copiedMsg: string
   }
 > = {
   pl: {
@@ -21,6 +22,7 @@ const DICT: Record<
     fb: 'Facebook',
     ig: 'Instagram',
     hours: { monfri: 'Pn–Pt: 10:00–20:00', sat: 'Sob: 10:00–21:00', sun: 'Nd: 11:00–20:00' },
+    copiedMsg: 'Adres email został skopiowany',
   },
   en: {
     mapsCta: 'Open in Google Maps',
@@ -28,6 +30,7 @@ const DICT: Record<
     fb: 'Facebook',
     ig: 'Instagram',
     hours: { monfri: 'Mon–Fri: 10:00–20:00', sat: 'Sat: 10:00–21:00', sun: 'Sun: 11:00–20:00' },
+    copiedMsg: 'Email address copied',  
   },
   de: {
     mapsCta: 'In Google Maps öffnen',
@@ -35,13 +38,16 @@ const DICT: Record<
     fb: 'Facebook',
     ig: 'Instagram',
     hours: { monfri: 'Mo–Fr: 10:00–20:00', sat: 'Sa: 10:00–21:00', sun: 'So: 11:00–20:00' },
+    copiedMsg: 'E-Mail-Adresse kopiert',
   },
 }
 
 export default function ContactSection() {
   const [lang, setLang] = useState<Lang>('pl')
+  const [copied, setCopied] = useState(false)
+  const t = useMemo(() => DICT[lang], [lang])
+  const EMAIL = 'juliaaw.business@gmail.com'
 
-  // nasłuch zmiany języka
   useEffect(() => {
     try {
       const saved = localStorage.getItem('lang') as Lang | null
@@ -55,19 +61,34 @@ export default function ContactSection() {
     return () => window.removeEventListener('davka:lang', onLang)
   }, [])
 
-  const t = useMemo(() => DICT[lang], [lang])
+  const copyEmail = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(EMAIL)
+      } else {
+        const ta = document.createElement('textarea')
+        ta.value = EMAIL
+        ta.setAttribute('readonly', '')
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+      }
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {}
+  }
 
   return (
     <section id="contact" className="relative bg-coffeeDark text-coffeeBeige pt-10 pb-8">
-      {/* fala u góry */}
       <div className="absolute inset-x-0 top-0 -translate-y-full">
         <WaveDivider top="fill-coffeeBeige" bottom="fill-coffeeDark" />
       </div>
 
       <div className="mx-auto max-w-6xl px-6">
-        {/* pasek kontaktowy */}
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          {/* adres → maps */}
           <a
             href="https://maps.app.goo.gl/YZ2T9mLWVyoG2Lub9"
             target="_blank"
@@ -81,10 +102,8 @@ export default function ContactSection() {
             </div>
           </a>
 
-          {/* separator */}
           <span className="hidden md:block h-6 w-px bg-white/20" />
 
-          {/* telefon */}
           <a href="tel:+48602255050" className="inline-flex items-center gap-3 hover:opacity-90 transition">
             <PhoneIcon className="h-6 w-6 text-coffeeBeige/90" />
             <div>
@@ -92,10 +111,8 @@ export default function ContactSection() {
             </div>
           </a>
 
-          {/* separator */}
           <span className="hidden md:block h-6 w-px bg-white/20" />
 
-          {/* mail */}
           <a href="mailto:davka.nysa@gmail.com" className="inline-flex items-center gap-3 hover:opacity-90 transition">
             <MailIcon className="h-6 w-6 text-coffeeBeige/90" />
             <div>
@@ -103,10 +120,8 @@ export default function ContactSection() {
             </div>
           </a>
 
-          {/* separator */}
           <span className="hidden md:block h-6 w-px bg-white/20" />
 
-          {/* social */}
           <div className="inline-flex items-center gap-3">
             <span className="sr-only">{t.srSocial}</span>
             <a
@@ -130,9 +145,7 @@ export default function ContactSection() {
           </div>
         </div>
 
-        {/* godziny + stopka */}
         <div className="mt-6 border-t border-white/15 pt-4">
-          {/* MOBILE — lista w kolumnie */}
           <div className="md:hidden flex flex-col gap-3">
             <div className="flex items-start gap-2 text-sm opacity-80">
               <ClockIcon className="h-5 w-5 mt-0.5" />
@@ -143,24 +156,22 @@ export default function ContactSection() {
               </ul>
             </div>
 
-            {/* SRODKOWANA STOPKA (MOBILE) */}
             <div className="mt-3 text-center space-y-1">
               <div className="text-xs opacity-60">© 2025 DaVka.</div>
               <div className="text-xs opacity-60">
                 Made by{' '}
-                <a
-                  href="https://example.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:opacity-90"
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' ? (e.preventDefault(), copyEmail()) : null)}
+                  className="underline hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
                 >
                   Julia Winiarska
-                </a>
+                </button>
               </div>
             </div>
           </div>
 
-          {/* DESKTOP — godziny w jednym rzędzie */}
           <div className="hidden md:flex md:items-center md:justify-between">
             <div className="text-sm opacity-80 inline-flex items-center gap-2">
               <ClockIcon className="h-5 w-5" />
@@ -172,28 +183,40 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* SRODKOWANA STOPKA (DESKTOP) — pod wszystkim */}
           <div className="hidden md:block mt-4 text-center space-y-1">
             <div className="text-xs opacity-60">© 2025 DaVka.</div>
             <div className="text-xs opacity-60">
               Made by{' '}
-              <a
-                href="https://example.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:opacity-90"
+              <button
+                type="button"
+                onClick={copyEmail}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' ? (e.preventDefault(), copyEmail()) : null)}
+                className="underline hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
               >
                 Julia Winiarska
-              </a>
+              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      <div
+        aria-live="polite"
+        className={[
+          'pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-4 z-[100]',
+          'transition-opacity duration-200',
+          copied ? 'opacity-100' : 'opacity-0',
+        ].join(' ')}
+      >
+<span className="px-3 py-1 rounded-full text-[11px] bg-black/75 text-white shadow">
+  {t.copiedMsg}
+</span>
+
       </div>
     </section>
   )
 }
 
-/* ===== Ikony SVG ===== */
 function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
