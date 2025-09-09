@@ -1,0 +1,241 @@
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import WaveDivider from './WaveDivider'
+
+type Lang = 'pl' | 'en' | 'de'
+
+const DICT: Record<
+  Lang,
+  {
+    mapsCta: string
+    srSocial: string
+    fb: string
+    ig: string
+    hours: { monfri: string; sat: string; sun: string }
+  }
+> = {
+  pl: {
+    mapsCta: 'Otwórz w Mapach Google',
+    srSocial: 'Social media',
+    fb: 'Facebook',
+    ig: 'Instagram',
+    hours: { monfri: 'Pn–Pt: 10:00–20:00', sat: 'Sob: 10:00–21:00', sun: 'Nd: 11:00–20:00' },
+  },
+  en: {
+    mapsCta: 'Open in Google Maps',
+    srSocial: 'Social media',
+    fb: 'Facebook',
+    ig: 'Instagram',
+    hours: { monfri: 'Mon–Fri: 10:00–20:00', sat: 'Sat: 10:00–21:00', sun: 'Sun: 11:00–20:00' },
+  },
+  de: {
+    mapsCta: 'In Google Maps öffnen',
+    srSocial: 'Soziale Medien',
+    fb: 'Facebook',
+    ig: 'Instagram',
+    hours: { monfri: 'Mo–Fr: 10:00–20:00', sat: 'Sa: 10:00–21:00', sun: 'So: 11:00–20:00' },
+  },
+}
+
+export default function ContactSection() {
+  const [lang, setLang] = useState<Lang>('pl')
+
+  // nasłuch zmiany języka
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('lang') as Lang | null
+      if (saved === 'pl' || saved === 'en' || saved === 'de') setLang(saved)
+    } catch {}
+    const onLang = (e: Event) => {
+      const l = (e as CustomEvent).detail
+      if (l === 'pl' || l === 'en' || l === 'de') setLang(l)
+    }
+    window.addEventListener('davka:lang', onLang)
+    return () => window.removeEventListener('davka:lang', onLang)
+  }, [])
+
+  const t = useMemo(() => DICT[lang], [lang])
+
+  return (
+    <section id="contact" className="relative bg-coffeeDark text-coffeeBeige pt-10 pb-8">
+      {/* fala u góry */}
+      <div className="absolute inset-x-0 top-0 -translate-y-full">
+        <WaveDivider top="fill-coffeeBeige" bottom="fill-coffeeDark" />
+      </div>
+
+      <div className="mx-auto max-w-6xl px-6">
+        {/* pasek kontaktowy */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          {/* adres → maps */}
+          <a
+            href="https://maps.app.goo.gl/YZ2T9mLWVyoG2Lub9"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 hover:opacity-90 transition"
+          >
+            <MapPinIcon className="h-6 w-6 text-coffeeBeige/90" />
+            <div>
+              <div className="font-semibold">Rynek 32, 48-300 Nysa</div>
+              <div className="text-sm opacity-70 group-hover:underline">{t.mapsCta}</div>
+            </div>
+          </a>
+
+          {/* separator */}
+          <span className="hidden md:block h-6 w-px bg-white/20" />
+
+          {/* telefon */}
+          <a href="tel:+48602255050" className="inline-flex items-center gap-3 hover:opacity-90 transition">
+            <PhoneIcon className="h-6 w-6 text-coffeeBeige/90" />
+            <div>
+              <div className="font-semibold">+48 602 255 050</div>
+            </div>
+          </a>
+
+          {/* separator */}
+          <span className="hidden md:block h-6 w-px bg-white/20" />
+
+          {/* mail */}
+          <a href="mailto:davka.nysa@gmail.com" className="inline-flex items-center gap-3 hover:opacity-90 transition">
+            <MailIcon className="h-6 w-6 text-coffeeBeige/90" />
+            <div>
+              <div className="font-semibold">davka.nysa@gmail.com</div>
+            </div>
+          </a>
+
+          {/* separator */}
+          <span className="hidden md:block h-6 w-px bg-white/20" />
+
+          {/* social */}
+          <div className="inline-flex items-center gap-3">
+            <span className="sr-only">{t.srSocial}</span>
+            <a
+              href="https://www.facebook.com/profile.php?id=61573148150091"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 hover:bg-white/10 transition"
+            >
+              <FacebookIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">{t.fb}</span>
+            </a>
+            <a
+              href="https://www.instagram.com/davka.nysa?utm_source=ig_web_button_share_sheet&igsh=MWhxMW5uanlzYWlmOQ=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 hover:bg-white/10 transition"
+            >
+              <InstagramIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">{t.ig}</span>
+            </a>
+          </div>
+        </div>
+
+        {/* godziny + stopka */}
+        <div className="mt-6 border-t border-white/15 pt-4">
+          {/* MOBILE — lista w kolumnie */}
+          <div className="md:hidden flex flex-col gap-3">
+            <div className="flex items-start gap-2 text-sm opacity-80">
+              <ClockIcon className="h-5 w-5 mt-0.5" />
+              <ul className="space-y-1.5">
+                <li>{t.hours.monfri}</li>
+                <li>{t.hours.sat}</li>
+                <li>{t.hours.sun}</li>
+              </ul>
+            </div>
+
+            {/* SRODKOWANA STOPKA (MOBILE) */}
+            <div className="mt-3 text-center space-y-1">
+              <div className="text-xs opacity-60">© 2025 DaVka.</div>
+              <div className="text-xs opacity-60">
+                Made by{' '}
+                <a
+                  href="https://example.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:opacity-90"
+                >
+                  Julia Winiarska
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* DESKTOP — godziny w jednym rzędzie */}
+          <div className="hidden md:flex md:items-center md:justify-between">
+            <div className="text-sm opacity-80 inline-flex items-center gap-2">
+              <ClockIcon className="h-5 w-5" />
+              <div className="flex flex-wrap items-center gap-6">
+                <span>{t.hours.monfri}</span>
+                <span>• {t.hours.sat}</span>
+                <span>• {t.hours.sun}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SRODKOWANA STOPKA (DESKTOP) — pod wszystkim */}
+          <div className="hidden md:block mt-4 text-center space-y-1">
+            <div className="text-xs opacity-60">© 2025 DaVka.</div>
+            <div className="text-xs opacity-60">
+              Made by{' '}
+              <a
+                href="https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-90"
+              >
+                Julia Winiarska
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ===== Ikony SVG ===== */
+function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
+      <path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  )
+}
+function PhoneIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
+      <path d="M3 5c0-1.1.9-2 2-2h2c.9 0 1.7.6 1.9 1.5l.7 2.7a2 2 0 0 1-.5 1.9l-1 1a14.5 14.5 0 0 0 6.8 6.8l1-1a2 2 0 0 1 1.9-.5l2.7.7c.9.2 1.5 1 1.5 1.9v2c0 1.1-.9 2-2 2h-1A17 17 0 0 1 3 6V5Z" />
+    </svg>
+  )
+}
+function MailIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
+      <path d="M4 6h16v12H4z" />
+      <path d="m4 6 8 7 8-7" />
+    </svg>
+  )
+}
+function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  )
+}
+function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06C2 17.05 5.66 21.2 10.44 22v-7.02H7.9v-2.92h2.54V9.41c0-2.5 1.5-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.62.77-1.62 1.56v1.87h2.76l-.44 2.92h-2.32V22C18.34 21.2 22 17.05 22 12.06Z" />
+    </svg>
+  )
+}
+function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm7.5-.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z" />
+    </svg>
+  )
+}
