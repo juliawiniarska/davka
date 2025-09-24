@@ -25,6 +25,7 @@ export default function CookieBanner() {
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [consent, setConsent] = useState<Consent | null>(null)
 
+  // sprawdzamy, czy w localStorage jest już zapis
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LS_KEY)
@@ -45,6 +46,16 @@ export default function CookieBanner() {
     } catch {
       setOpen(true)
     }
+  }, [])
+
+  // nasłuch na event "open-cookie-prefs"
+  useEffect(() => {
+    const openPrefs = () => {
+      setOpen(true) // pokaż baner
+      setPrefsOpen(true) // od razu tryb ustawień
+    }
+    window.addEventListener("open-cookie-prefs", openPrefs)
+    return () => window.removeEventListener("open-cookie-prefs", openPrefs)
   }, [])
 
   // Ładowanie Google Analytics tylko po zgodzie

@@ -14,7 +14,7 @@ const play = Playfair_Display({
 });
 
 export const metadata = {
-  title: "davka. | Kawiarnia w Nysie",
+  title: "davka.",
   description:
     "davka. – elegancka kawiarnia w centrum Nysy. Wyjątkowa kawa specialty, matcha, lody rzemieślnicze, śniadania, drinki, piwo Peroni i wino w klimatycznym wnętrzu.",
   keywords: [
@@ -38,19 +38,19 @@ export const metadata = {
     images: [
       {
         url: "/logo.png",
-        width: 1200,
-        height: 630,
+        width: 192,
+        height: 192,
         alt: "davka. kawiarnia w Nysie",
       },
     ],
     locale: "pl_PL",
     type: "website",
   },
- icons: {
-  icon: "/logo.png", // twoje logo w folderze public
-  shortcut: "/logo.png",
-  apple: "/logo.png", // żeby działało też na iOS
-},
+icons: {
+    icon: "/logo-50x50.png",       // klasyczna
+    shortcut: "/logo-50x50.png",
+    apple: "/logo-225x225.png",    // dla iOS
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

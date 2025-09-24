@@ -9,14 +9,12 @@ type Payload = { status: 'ok'|'empty'|'closed'|'error'; images: Img[] }
 const VIEW_H = 420
 const WAVE_PX = 128
 const SPEED = 60
-
 const PAUSE_MS_DESKTOP = 120_000
 
-const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768
-const visibleCount = () => (isMobile() ? 1 : 4)
-const pauseMs = () => (isMobile() ? 3000 : PAUSE_MS_DESKTOP)
-const shouldShowArrows = (imgs: Img[]) => imgs.length > (isMobile() ? 1 : 4)
-
+const visibleCount = (isMobile: boolean) => (isMobile ? 1 : 4)
+const pauseMs = (isMobile: boolean) => (isMobile ? 3000 : PAUSE_MS_DESKTOP)
+const shouldShowArrows = (imgs: Img[], isMobile: boolean) =>
+  imgs.length > (isMobile ? 1 : 4)
 
 type Lang = 'pl'|'en'|'de'
 const TEXTS: Record<Lang, {
@@ -24,34 +22,28 @@ const TEXTS: Record<Lang, {
 }> = {
   pl: {
     title: 'WITRYNA DNIA',
-    subtitle: 'Każdego dnia tworzymy coś nowego, dlatego codziennie sprawdzaj naszą witrynę tutaj lub na Instagramie davka.nysa', 
-    empty: 'Nowa witryna się tworzy, dlatego przedstawiamy nasze przykładowe pyszności', 
+    subtitle: 'Każdego dnia tworzymy coś nowego, dlatego codziennie sprawdzaj naszą witrynę tutaj lub na Instagramie davka.nysa',
+    empty: 'Nowa witryna się tworzy, dlatego przedstawiamy nasze przykładowe pyszności',
     closed: 'Oferta może być już niektualna, zaglądnij tutaj jutro lub odwiedź nas i sprawdź sam!',
     prev: 'Poprzednie',
     next: 'Następne',
   },
-en: {
-  title: 'SHOWCASE OF THE DAY',
-  subtitle:
-    'We create something new every day, so check our showcase here or on Instagram at davka.nysa every day',
-  empty:
-    'The new showcase is being prepared, so we are presenting our sample treats',
-  closed:
-    'The offer may already be outdated, check back here tomorrow or visit us and see for yourself!',
-  prev: 'Previous',
-  next: 'Next',
-},
-de: {
-  title: 'TAGESAUSSTELLUNG',
-  subtitle:
-    'Wir schaffen jeden Tag etwas Neues, deshalb schau dir unsere Vitrine hier oder auf Instagram unter davka.nysa jeden Tag an',
-  empty:
-    'Die neue Vitrine wird gerade erstellt, daher zeigen wir unsere Beispiel-Leckereien',
-  closed:
-    'Das Angebot könnte bereits nicht mehr aktuell sein, schau morgen hier wieder vorbei oder besuche uns und überzeug dich selbst!',
-  prev: 'Zurück',
-  next: 'Weiter',
-}
+  en: {
+    title: 'SHOWCASE OF THE DAY',
+    subtitle: 'We create something new every day, so check our showcase here or on Instagram at davka.nysa every day',
+    empty: 'The new showcase is being prepared, so we are presenting our sample treats',
+    closed: 'The offer may already be outdated, check back here tomorrow or visit us and see for yourself!',
+    prev: 'Previous',
+    next: 'Next',
+  },
+  de: {
+    title: 'TAGESAUSSTELLUNG',
+    subtitle: 'Wir schaffen jeden Tag etwas Neues, deshalb schau dir unsere Vitrine hier oder auf Instagram unter davka.nysa jeden Tag an',
+    empty: 'Die neue Vitrine wird gerade erstellt, daher zeigen wir unsere Beispiel-Leckereien',
+    closed: 'Das Angebot könnte bereits nicht mehr aktuell sein, schau morgen hier wieder vorbei oder besuche uns und überzeug dich selbst!',
+    prev: 'Zurück',
+    next: 'Weiter',
+  }
 }
 
 const FALLBACK_IMAGES: Img[] = [
@@ -64,6 +56,7 @@ const FALLBACK_IMAGES: Img[] = [
 export default function DailyShowcase() {
   const [data, setData] = useState<Payload>({ status: 'empty', images: [] })
   const [lang, setLang] = useState<Lang>('pl')
+  const [isMobile, setIsMobile] = useState(false)
 
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
@@ -77,6 +70,15 @@ export default function DailyShowcase() {
 
   const phaseRef = useRef<'forward'|'backward'|'pause'|'idle'>('pause')
   const pauseTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const check = () => setIsMobile(window.innerWidth < 768)
+      check()
+      window.addEventListener('resize', check)
+      return () => window.removeEventListener('resize', check)
+    }
+  }, [])
 
   useEffect(() => {
     try {
@@ -107,49 +109,34 @@ export default function DailyShowcase() {
     return () => { active = false; clearInterval(t) }
   }, [])
 
-const now = new Date()
-const h = now.getHours()
-const m = now.getMinutes()
+  const now = new Date()
+  const h = now.getHours()
+  const m = now.getMinutes()
 
-let displayStatus: Payload['status'] = data.status
-let imgs = data.images ?? []
-const count = imgs.length
+  let displayStatus: Payload['status'] = data.status
+  let imgs = data.images ?? []
+  const count = imgs.length
 
-const inLateWindow = h >= 21 && h <= 23
+  const inLateWindow = h >= 21 && h <= 23
+  if (h === 0 && m >= 1) displayStatus = 'empty'
+  if (inLateWindow && count > 0) displayStatus = 'ok'
 
-if (h === 0 && m >= 1) {
-  displayStatus = 'empty'
-}
+  const useFallback =
+    displayStatus === 'empty' || displayStatus === 'error' || count === 0
 
-if (inLateWindow && count > 0) {
-  displayStatus = 'ok'
-}
+  if (useFallback) imgs = FALLBACK_IMAGES
 
-const useFallback =
-  displayStatus === 'empty' || displayStatus === 'error' || count === 0
+  type SubKey = 'subtitle' | 'closed' | 'empty'
+  let subtitleKey: SubKey = 'subtitle'
+  if (displayStatus === 'empty' || useFallback) subtitleKey = 'empty'
+  else if (inLateWindow && count > 0) subtitleKey = 'closed'
 
-if (useFallback) {
-  imgs = FALLBACK_IMAGES
-}
-
-type SubKey = 'subtitle' | 'closed' | 'empty'
-let subtitleKey: SubKey = 'subtitle'
-
-if (displayStatus === 'empty' || useFallback) {
-  subtitleKey = 'empty'
-} else if (inLateWindow && count > 0) {
-  subtitleKey = 'closed'
-} else {
-  subtitleKey = 'subtitle'
-}
-
-const stepPx = () => {
-  const vp = viewportRef.current
-  if (!vp) return 0
-  return vp.clientWidth / visibleCount()
-}
-const maxPos = () => Math.max(0, (imgs.length - visibleCount()) * stepPx())
-
+  const stepPx = () => {
+    const vp = viewportRef.current
+    if (!vp) return 0
+    return vp.clientWidth / visibleCount(isMobile)
+  }
+  const maxPos = () => Math.max(0, (imgs.length - visibleCount(isMobile)) * stepPx())
 
   useEffect(() => {
     posRef.current = 0
@@ -157,21 +144,19 @@ const maxPos = () => Math.max(0, (imgs.length - visibleCount()) * stepPx())
     updateEdges()
     applyTransform()
     startPauseCycle()
-  }, [imgs.length])
+  }, [imgs.length, isMobile])
 
-const updateEdges = () => {
-  if (!shouldShowArrows(imgs)) {
-    setAtStart(false)
-    setAtEnd(false)
-    return
+  const updateEdges = () => {
+    if (!shouldShowArrows(imgs, isMobile)) {
+      setAtStart(false)
+      setAtEnd(false)
+      return
+    }
+    const pos = posRef.current
+    const max = maxPos()
+    setAtStart(pos <= 1)
+    setAtEnd(pos >= max - 1)
   }
-  const pos = posRef.current
-  const max = maxPos()
-  setAtStart(pos <= 1)
-  setAtEnd(pos >= max - 1)
-}
-
-
 
   const applyTransform = () => {
     const el = trackRef.current
@@ -193,15 +178,14 @@ const updateEdges = () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
     rafRef.current = requestAnimationFrame(tick)
   }
-const startPauseCycle = () => {
-  phaseRef.current = 'pause'
-  if (rafRef.current) cancelAnimationFrame(rafRef.current)
-  if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
-  pauseTimerRef.current = window.setTimeout(() => {
-    startForward()
-  }, pauseMs())
-}
-
+  const startPauseCycle = () => {
+    phaseRef.current = 'pause'
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
+    pauseTimerRef.current = window.setTimeout(() => {
+      startForward()
+    }, pauseMs(isMobile))
+  }
 
   const tick = (ts: number) => {
     const phase = phaseRef.current
@@ -209,7 +193,6 @@ const startPauseCycle = () => {
       rafRef.current = requestAnimationFrame(tick)
       return
     }
-
     if (lastTsRef.current == null) lastTsRef.current = ts
     const dt = (ts - lastTsRef.current) / 1000
     lastTsRef.current = ts
@@ -269,7 +252,7 @@ const startPauseCycle = () => {
     }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [imgs.length])
+  }, [imgs.length, isMobile])
 
   const nudge = (dir: -1 | 1) => {
     const max = maxPos()
@@ -300,40 +283,27 @@ const startPauseCycle = () => {
 
   if (useFallback) {
     return (
-<section
-  id="daily"
-  className="relative text-coffeeDark pt-2 isolate overflow-x-hidden"
-   style={{
-    paddingTop: isMobile() ? 0 : 8, 
-    paddingBottom: isMobile() ? WAVE_PX / 2 : WAVE_PX + 8,
-  }}
->
-
-<div
-  aria-hidden
-  className="absolute inset-x-0 top-0 -z-10"
-  style={{
-    height: `calc(100% - ${WAVE_PX}px)`,
-    backgroundImage:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'url(/backm2.png)'   // mobile
-        : 'url(/back2.png)',  // desktop
-    backgroundSize:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'cover'
-        : '100% 100%',
-    backgroundPosition:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'center top'
-        : 'top center',
-    backgroundRepeat: 'no-repeat',
-    backgroundColor: '#f4e6c9',
-  }}
-/>
-
-
-<TitlePaper title={t.title} subtitle={t[subtitleKey]} />
-
+      <section
+        id="daily"
+        className="relative text-coffeeDark pt-2 isolate overflow-x-hidden"
+        style={{
+          paddingTop: isMobile ? 0 : 8,
+          paddingBottom: isMobile ? WAVE_PX + 24 : WAVE_PX + 8
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 -z-10"
+          style={{
+            height: `calc(100% - ${WAVE_PX}px)`,
+            backgroundImage: isMobile ? 'url(/backm2.png)' : 'url(/back2.png)',
+            backgroundSize: isMobile ? 'cover' : '100% 100%',
+            backgroundPosition: isMobile ? 'center top' : 'top center',
+            backgroundRepeat: 'no-repeat',
+            backgroundColor: '#f4e6c9',
+          }}
+        />
+        <TitlePaper title={t.title} subtitle={t[subtitleKey]} />
         <div className="relative mx-auto max-w-6xl px-6 z-10">
           <div
             className="relative rounded-3xl border border-white/25 bg-white/5 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_10px_30px_rgba(0,0,0,0.08)]"
@@ -341,19 +311,14 @@ const startPauseCycle = () => {
           >
             <div className="absolute inset-0 rounded-3xl p-4">
               <div className="absolute inset-4 rounded-2xl border border-white/20 pointer-events-none" />
-
               <div ref={viewportRef} className="overflow-hidden h-full">
                 <div
                   ref={trackRef}
                   className="flex will-change-transform h-full [backface-visibility:hidden] [transform:translateZ(0)]"
                 >
                   {FALLBACK_IMAGES.map((img) => (
-<div key={img.id} className="basis-full md:basis-1/4 shrink-0 px-2 h-full">
-                      <div
-                        className="relative h-full rounded-2xl overflow-hidden bg-white/6 border border-white/20
-                                   shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]
-                                   [backface-visibility:hidden] [transform:translateZ(0)]"
-                      >
+                    <div key={img.id} className="basis-full md:basis-1/4 shrink-0 px-2 h-full">
+                      <div className="relative h-full rounded-2xl overflow-hidden bg-white/6 border border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] [backface-visibility:hidden] [transform:translateZ(0)]">
                         <Image
                           src={img.url}
                           alt="Witryna dnia kawiarni Davka – świeże wypieki, kawa specialty, matcha i desery"
@@ -375,15 +340,12 @@ const startPauseCycle = () => {
                   ))}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
-
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-[#f4e6c9]">
-  <WaveDivider3 flip className="w-full" />
-</div>
-
+          <WaveDivider3 flip className="w-full" />
+        </div>
       </section>
     )
   }
@@ -392,35 +354,22 @@ const startPauseCycle = () => {
     <section
       id="daily"
       className="relative text-coffeeDark pt-2 isolate"
-      style={{ paddingBottom: WAVE_PX + 8 }}
+      style={{     paddingBottom: isMobile ? WAVE_PX + 24 : WAVE_PX + 8
+ }}
     >
-<div
-  aria-hidden
-  className="absolute inset-x-0 top-0 -z-10"
-  style={{
-    height: `calc(100% - ${WAVE_PX}px)`,
-    backgroundImage:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'url(/backm2.png)'   // mobile
-        : 'url(/back2.png)',  // desktop
-    backgroundSize:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'cover'
-        : '100% 100%',
-    backgroundPosition:
-      typeof window !== 'undefined' && window.innerWidth < 768
-        ? 'center top'
-        : 'top center',
-    backgroundRepeat: 'no-repeat',
-    backgroundColor: '#f4e6c9',
-  }}
-/>
-
-
-
-
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 -z-10"
+        style={{
+          height: `calc(100% - ${WAVE_PX}px)`,
+          backgroundImage: isMobile ? 'url(/backm2.png)' : 'url(/back2.png)',
+          backgroundSize: isMobile ? 'cover' : '100% 100%',
+          backgroundPosition: isMobile ? 'center top' : 'top center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#f4e6c9',
+        }}
+      />
       <TitlePaper title={t.title} subtitle={t.subtitle} />
-
       <div className="relative mx-auto max-w-6xl px-6 z-10">
         <div
           className="relative rounded-3xl border border-white/25 bg-white/5 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_10px_30px_rgba(0,0,0,0.08)]"
@@ -428,56 +377,47 @@ const startPauseCycle = () => {
         >
           <div className="absolute inset-0 rounded-3xl p-4">
             <div className="absolute inset-4 rounded-2xl border border-white/20 pointer-events-none" />
-
-{shouldShowArrows(imgs) && (
-  <>
-    <Arrow side="left"  disabled={atStart} onClick={() => nudge(-1)} label={t.prev} />
-    <Arrow side="right" disabled={atEnd}   onClick={() => nudge(1)}  label={t.next} />
-  </>
-)}
-
-
-
+            {shouldShowArrows(imgs, isMobile) && (
+              <>
+                <Arrow side="left" disabled={atStart} onClick={() => nudge(-1)} label={t.prev} />
+                <Arrow side="right" disabled={atEnd} onClick={() => nudge(1)} label={t.next} />
+              </>
+            )}
             <div ref={viewportRef} className="overflow-hidden h-full">
               <div
                 ref={trackRef}
                 className="flex will-change-transform h-full [backface-visibility:hidden] [transform:translateZ(0)]"
               >
                 {imgs.map((img) => (
-<div key={img.id} className="basis-full md:basis-1/4 shrink-0 px-2 h-full">
-                    <div
-                      className="relative h-full rounded-2xl overflow-hidden bg-white/6 border border-white/20
-                                 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]
-                                 [backface-visibility:hidden] [transform:translateZ(0)]"
-                    >
+                  <div key={img.id} className="basis-full md:basis-1/4 shrink-0 px-2 h-full">
+                    <div className="relative h-full rounded-2xl overflow-hidden bg-white/6 border border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] [backface-visibility:hidden] [transform:translateZ(0)]">
                       <Image
                         src={img.url}
-                          alt="Witryna dnia kawiarni Davka – świeże wypieki, kawa specialty, matcha i desery"
+                        alt="Witryna dnia kawiarni Davka – świeże wypieki, kawa specialty, matcha i desery"
                         fill
                         quality={100}
-sizes="100vw md:25vw"
+                        sizes="100vw md:25vw"
                         className="object-cover"
                         priority
                       />
                       <div
                         className="pointer-events-none absolute inset-0"
-                        style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.0) 45%)' }}
+                        style={{
+                          background:
+                            'linear-gradient(160deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.0) 45%)',
+                        }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
           </div>
         </div>
       </div>
-
-<div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-[#f4e6c9]">
-  <WaveDivider3 flip className="w-full" />
-</div>
-
-
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-[#f4e6c9]">
+        <WaveDivider3 flip className="w-full" />
+      </div>
     </section>
   )
 }
@@ -491,12 +431,10 @@ function TitlePaper({ title, subtitle }: { title: string; subtitle?: string }) {
       >
         {title}
       </h2>
-
       <div className="sr-only">
-  Nasza codzienna witryna obejmuje kawę specialty, matchę, lody rzemieślnicze,
-  świeże śniadania, domowe ciasta, drinki, piwo Peroni oraz wino.
-</div>
-
+        Nasza codzienna witryna obejmuje kawę specialty, matchę, lody rzemieślnicze,
+        świeże śniadania, domowe ciasta, drinki, piwo Peroni oraz wino.
+      </div>
       {subtitle && (
         <p className="mt-3 md:mt-4 text-xs md:text-sm opacity-80 font-sans">
           {subtitle.split('davka.nysa').map((part, idx, arr) => (
@@ -504,12 +442,12 @@ function TitlePaper({ title, subtitle }: { title: string; subtitle?: string }) {
               {part}
               {idx < arr.length - 1 && (
                 <a
-href="https://www.instagram.com/davka.nysa/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="font-bold hover:opacity-80 transition"
-  aria-label="Instagram kawiarni Davka"
-  title="Instagram kawiarni Davka"
+                  href="https://www.instagram.com/davka.nysa/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold hover:opacity-80 transition"
+                  aria-label="Instagram kawiarni Davka"
+                  title="Instagram kawiarni Davka"
                 >
                   davka.nysa
                 </a>
@@ -521,8 +459,6 @@ href="https://www.instagram.com/davka.nysa/"
     </div>
   )
 }
-
-
 
 function Arrow({
   side, disabled, onClick, label
