@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://davkacafe.pl
+
+# Sitemaps
+Sitemap: https://davkacafe.pl/sitemap.xml
