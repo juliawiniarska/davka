@@ -1,6 +1,6 @@
 type Props = {
   flip?: boolean
-  color?: string // zamiast top/bottom wystarczy jeden kolor
+  color?: string
   className?: string
 }
 

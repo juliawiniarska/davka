@@ -22,7 +22,11 @@ const DICT: Record<
     srSocial: 'Social media',
     fb: 'Facebook',
     ig: 'Instagram',
-    hours: { monfri: 'Pn–Pt: 10:00–20:00', sat: 'Sob: 10:00–21:00', sun: 'Nd: 11:00–20:00' },
+    hours: {
+      monfri: 'Pn–Pt: 10:00–20:00',
+      sat: 'Sob: 10:00–20:00',
+      sun: 'Nd: 11:00–20:00',
+    },
     copiedMsg: 'Adres email został skopiowany',
   },
   en: {
@@ -30,15 +34,23 @@ const DICT: Record<
     srSocial: 'Social media',
     fb: 'Facebook',
     ig: 'Instagram',
-    hours: { monfri: 'Mon–Fri: 10:00–20:00', sat: 'Sat: 10:00–21:00', sun: 'Sun: 11:00–20:00' },
-    copiedMsg: 'Email address copied',  
+    hours: {
+      monfri: 'Mon–Fri: 10:00–20:00',
+      sat: 'Sat: 10:00–20:00',
+      sun: 'Sun: 11:00–20:00',
+    },
+    copiedMsg: 'Email address copied',
   },
   de: {
     mapsCta: 'In Google Maps öffnen',
     srSocial: 'Soziale Medien',
     fb: 'Facebook',
     ig: 'Instagram',
-    hours: { monfri: 'Mo–Fr: 10:00–20:00', sat: 'Sa: 10:00–21:00', sun: 'So: 11:00–20:00' },
+    hours: {
+      monfri: 'Mo–Fr: 10:00–20:00',
+      sat: 'Sa: 10:00–20:00',
+      sun: 'So: 11:00–20:00',
+    },
     copiedMsg: 'E-Mail-Adresse kopiert',
   },
 }
@@ -48,6 +60,18 @@ export default function ContactSection() {
   const [copied, setCopied] = useState(false)
   const t = useMemo(() => DICT[lang], [lang])
   const EMAIL = 'juliaaw.business@gmail.com'
+
+  const hoursParts = useMemo(() => {
+    const split = (s: string): [string, string] => {
+      const m = s.match(/^(.*?:)\s*(.*)$/)
+      return m ? [m[1], m[2]] as [string, string] : [s, '']
+    }
+    return {
+      monfri: split(t.hours.monfri),
+      sat: split(t.hours.sat),
+      sun: split(t.hours.sun),
+    }
+  }, [t])
 
   useEffect(() => {
     try {
@@ -85,7 +109,7 @@ export default function ContactSection() {
   return (
     <section id="contact" className="relative bg-coffeeDark text-coffeeBeige pt-10 pb-8">
       <div className="absolute inset-x-0 top-0 -translate-y-full">
-<WaveDivider color="fill-coffeeDark" />
+        <WaveDivider color="fill-coffeeDark" />
       </div>
       <h2 className="sr-only">Kontakt</h2>
 
@@ -157,97 +181,69 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <div className="mt-6 border-t border-white/15 pt-4">
-<div className="md:hidden flex flex-col gap-3">
-  <div className="flex items-start gap-2 text-sm opacity-80">
-  <ClockIcon className="h-5 w-5 mt-0.5" />
-    <ul
-      className="space-y-1.5 leading-relaxed"
-      itemScope
-      itemType="https://schema.org/OpeningHoursSpecification"
-    >
-      <li itemProp="dayOfWeek" content="Monday Tuesday Wednesday Thursday Friday">
-        <meta itemProp="opens" content="10:00" />
-        <meta itemProp="closes" content="20:00" />
-        {t.hours.monfri}
-      </li>
-      <li itemProp="dayOfWeek" content="Saturday">
-        <meta itemProp="opens" content="10:00" />
-        <meta itemProp="closes" content="21:00" />
-        {t.hours.sat}
-      </li>
-      <li itemProp="dayOfWeek" content="Sunday">
-        <meta itemProp="opens" content="11:00" />
-        <meta itemProp="closes" content="20:00" />
-        {t.hours.sun}
-      </li>
-    </ul>
-  </div>
+        <div className="mt-6 text-sm opacity-80">
+          <div className="flex items-start gap-2">
+            <ClockIcon className="h-5 w-5 mt-0.5" />
 
+            <ul
+              className="md:hidden space-y-1.5 leading-relaxed"
+              itemScope
+              itemType="https://schema.org/OpeningHoursSpecification"
+            >
+              <li className="grid grid-cols-[7ch_1fr]">
+                <span>{hoursParts.monfri[0]}</span>
+                <span className="pl-2 tabular-nums">{hoursParts.monfri[1]}</span>
+              </li>
+              <li className="grid grid-cols-[7ch_1fr]">
+                <span>{hoursParts.sat[0]}</span>
+                <span className="pl-2 tabular-nums">{hoursParts.sat[1]}</span>
+              </li>
+              <li className="grid grid-cols-[7ch_1fr]">
+                <span>{hoursParts.sun[0]}</span>
+                <span className="pl-2 tabular-nums">{hoursParts.sun[1]}</span>
+              </li>
+            </ul>
 
-<div className="mt-3 text-center space-y-2">
-  {/* Wiersz 1 – środek */}
-  <div className="text-xs opacity-60">© 2025 davka.</div>
+            <div className="hidden md:flex md:gap-6 md:justify-start">
+              <span>{t.hours.monfri}</span>
+              <span>{t.hours.sat}</span>
+              <span>{t.hours.sun}</span>
+            </div>
+          </div>
+        </div>
 
-  {/* Wiersz 2 – lewa/prawa */}
-  <div className="flex items-center justify-between text-xs opacity-60">
-    <div>
-      Made by{" "}
-      <button
-        type="button"
-        onClick={copyEmail}
-        onKeyDown={(e) =>
-          e.key === "Enter" || e.key === " "
-            ? (e.preventDefault(), copyEmail())
-            : null
-        }
-        className="font-bold hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
-      >
-        Julia Winiarska
-      </button>
-    </div>
-    <button
-      type="button"
-      onClick={() => window.dispatchEvent(new Event("open-cookie-prefs"))}
-      className="hover:opacity-90 transition focus:outline-none"
-    >
-      Ustawienia cookies
-    </button>
-  </div>
-</div>
-</div>
+        <div className="mt-6 border-t border-white/15 pt-4 text-xs opacity-60 space-y-2">
+          <div className="text-center">© 2025 daVka.</div>
 
-<div className="hidden md:flex md:flex-col mt-4 text-xs opacity-60 space-y-2">
-  {/* Wiersz 1 – środek */}
-  <div className="text-center">© 2025 davka.</div>
+          <div className="text-center">
+            Made by{' '}
+            <button
+              type="button"
+              onClick={copyEmail}
+              onKeyDown={(e) =>
+                e.key === 'Enter' || e.key === ' ' ? (e.preventDefault(), copyEmail()) : null
+              }
+              className="font-bold hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
+            >
+              Julia Winiarska
+            </button>
+          </div>
 
-  {/* Wiersz 2 – lewa/prawa */}
-  <div className="flex items-center justify-between">
-    <div>
-      Made by{" "}
-      <button
-        type="button"
-        onClick={copyEmail}
-        onKeyDown={(e) =>
-          e.key === "Enter" || e.key === " "
-            ? (e.preventDefault(), copyEmail())
-            : null
-        }
-        className="font-bold hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
-      >
-        Julia Winiarska
-      </button>
-    </div>
-    <button
-      type="button"
-      onClick={() => window.dispatchEvent(new Event("open-cookie-prefs"))}
-      className="hover:opacity-90 transition focus:outline-none"
-    >
-      Ustawienia cookies
-    </button>
-  </div>
-</div>
-
+          <div className="flex items-center justify-between">
+            <a
+              href="/polityka-prywatnosci"
+              className="hover:opacity-90 transition focus:outline-none"
+            >
+              Polityka prywatności
+            </a>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('open-cookie-prefs'))}
+              className="hover:opacity-90 transition focus:outline-none"
+            >
+              Ustawienia cookies
+            </button>
+          </div>
         </div>
       </div>
 
@@ -264,52 +260,51 @@ export default function ContactSection() {
         </span>
       </div>
 
-      {/* JSON-LD schema.org dla SEO */}
       <Script id="opening-hours" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "CafeOrCoffeeShop",
-          "name": "davka.",
-          "image": "https://davkacafe.pl/logo.png",
-          "url": "https://davkacafe.pl",
-          "telephone": "+48 602 255 050",
-          "email": "davka.nysa@gmail.com",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Rynek 32",
-            "addressLocality": "Nysa",
-            "postalCode": "48-300",
-            "addressCountry": "PL"
+          '@context': 'https://schema.org',
+          '@type': 'CafeOrCoffeeShop',
+          name: 'davka.',
+          image: 'https://davkacafe.pl/logo.png',
+          url: 'https://davkacafe.pl',
+          telephone: '+48 602 255 050',
+          email: 'davka.nysa@gmail.com',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Rynek 32',
+            addressLocality: 'Nysa',
+            postalCode: '48-300',
+            addressCountry: 'PL',
           },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 50.47430334446845,
-            "longitude": 17.332278660783693
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: 50.47430334446845,
+            longitude: 17.332278660783693,
           },
-          "sameAs": [
-            "https://www.facebook.com/profile.php?id=61573148150091",
-            "https://www.instagram.com/davka.nysa/"
+          sameAs: [
+            'https://www.facebook.com/profile.php?id=61573148150091',
+            'https://www.instagram.com/davka.nysa/',
           ],
-          "openingHoursSpecification": [
+          openingHoursSpecification: [
             {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-              "opens": "10:00",
-              "closes": "20:00"
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+              opens: '10:00',
+              closes: '20:00',
             },
             {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": "Saturday",
-              "opens": "10:00",
-              "closes": "21:00"
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: 'Saturday',
+              opens: '10:00',
+              closes: '20:00',
             },
             {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": "Sunday",
-              "opens": "11:00",
-              "closes": "20:00"
-            }
-          ]
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: 'Sunday',
+              opens: '11:00',
+              closes: '20:00',
+            },
+          ],
         })}
       </Script>
     </section>
