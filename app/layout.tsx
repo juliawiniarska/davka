@@ -47,9 +47,9 @@ export const metadata = {
     type: "website",
   },
 icons: {
-    icon: "/logo-50x50.png",       // klasyczna
+    icon: "/logo-50x50.png",       
     shortcut: "/logo-50x50.png",
-    apple: "/logo-225x225.png",    // dla iOS
+    apple: "/logo-225x225.png",    
   },
 };
 
