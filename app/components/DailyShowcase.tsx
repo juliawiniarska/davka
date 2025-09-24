@@ -297,7 +297,7 @@ export default function DailyShowcase() {
           style={{
             height: `calc(100% - ${WAVE_PX}px)`,
             backgroundImage: isMobile ? 'url(/backm2.png)' : 'url(/back2.png)',
-            backgroundSize: isMobile ? 'cover' : '100% 100%',
+            backgroundSize: isMobile ? '100% 100%' : '100% 100%',
             backgroundPosition: isMobile ? 'center top' : 'top center',
             backgroundRepeat: 'no-repeat',
             backgroundColor: '#f4e6c9',
@@ -363,7 +363,8 @@ export default function DailyShowcase() {
         style={{
           height: `calc(100% - ${WAVE_PX}px)`,
           backgroundImage: isMobile ? 'url(/backm2.png)' : 'url(/back2.png)',
-          backgroundSize: isMobile ? 'cover' : '100% 100%',
+          backgroundSize: isMobile ? 'contain' : '100% 100%',
+
           backgroundPosition: isMobile ? 'center top' : 'top center',
           backgroundRepeat: 'no-repeat',
           backgroundColor: '#f4e6c9',

@@ -119,7 +119,7 @@ export default function Header() {
           </ul>
 
           <div className="group relative inline-block text-sm md:text-base font-londrina text-coffeeBeige">
-            <div className="flex items-center gap-1 pointer-events-none">
+            <div className="flex items-center gap-0 pointer-events-none">
               <Image src={FLAG_SRC[lang]} alt={t.ui.code} width={45} height={45} className="object-contain" />
               <span>{t.ui.code}</span>
               <span className="text-xs">▼</span>
@@ -134,7 +134,7 @@ export default function Header() {
                 {otherLangs(lang).map((l) => (
                   <li
                     key={l}
-                    className="flex items-center gap-2 hover:opacity-80 cursor-pointer"
+                    className="flex items-center gap-1 hover:opacity-80 cursor-pointer"
                     onClick={() => {
                       setLang(l)
                       try { localStorage.setItem('lang', l) } catch {}
@@ -200,7 +200,7 @@ export default function Header() {
 
         <div className="relative h-[33%] md:h-auto md:flex-[1_1_50%] mt-[4px] md:mt-0">
           <Image
-            src="/davkaa.png"
+            src="/davka.webp"
             alt={t.alt.center}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
