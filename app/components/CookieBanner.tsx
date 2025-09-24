@@ -57,7 +57,7 @@ export default function CookieBanner() {
   useEffect(() => {
     if (consent?.analytics) {
       const script = document.createElement('script')
-      script.src = `https://www.googletagmanager.com/gtag/js?id=GA_ID`
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`
       script.async = true
       document.head.appendChild(script)
 
