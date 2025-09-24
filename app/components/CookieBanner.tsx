@@ -3,17 +3,14 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-// Typ zgody
 type Consent = {
   necessary: boolean
   analytics: boolean
 }
 
-// Klucz w localStorage
-const LS_KEY = 'cookie-consent-v3' // zmiana wersji = ponowne pytanie
+const LS_KEY = 'cookie-consent-v3'
 const CONSENT_VALIDITY_DAYS = 365
 
-// Rozszerzamy typ window, żeby nie było błędu z dataLayer
 declare global {
   interface Window {
     dataLayer: any[]
@@ -24,8 +21,9 @@ export default function CookieBanner() {
   const [open, setOpen] = useState(false)
   const [prefsOpen, setPrefsOpen] = useState(false)
   const [consent, setConsent] = useState<Consent | null>(null)
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
-  // sprawdzamy, czy w localStorage jest już zapis
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LS_KEY)
@@ -35,34 +33,31 @@ export default function CookieBanner() {
         const diffDays = (now - parsed.timestamp) / (1000 * 60 * 60 * 24)
 
         if (diffDays > CONSENT_VALIDITY_DAYS) {
-          // zgoda wygasła → pokaż baner
           setOpen(true)
         } else {
           setConsent(parsed.consent)
         }
       } else {
-        setOpen(true) // brak zapisu → pokaż baner
+        setOpen(true)
       }
     } catch {
       setOpen(true)
     }
   }, [])
 
-  // nasłuch na event "open-cookie-prefs"
   useEffect(() => {
     const openPrefs = () => {
-      setOpen(true) // pokaż baner
-      setPrefsOpen(true) // od razu tryb ustawień
+      setOpen(true)
+      setPrefsOpen(true)
     }
     window.addEventListener("open-cookie-prefs", openPrefs)
     return () => window.removeEventListener("open-cookie-prefs", openPrefs)
   }, [])
 
-  // Ładowanie Google Analytics tylko po zgodzie
   useEffect(() => {
     if (consent?.analytics) {
       const script = document.createElement('script')
-      script.src = `https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX`
+      script.src = `https://www.googletagmanager.com/gtag/js?id=GA_ID`
       script.async = true
       document.head.appendChild(script)
 
@@ -71,7 +66,7 @@ export default function CookieBanner() {
         window.dataLayer.push(args)
       }
       gtag('js', new Date())
-      gtag('config', 'G-XXXXXXXXXX')
+      gtag('config', 'GA_ID')
     }
   }, [consent])
 
