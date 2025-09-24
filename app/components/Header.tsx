@@ -203,7 +203,6 @@ export default function Header() {
             src="/davkaa.png"
             alt={t.alt.center}
             fill
-            quality={60}
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover object-center"
             priority
