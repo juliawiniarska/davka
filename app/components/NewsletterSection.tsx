@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import WaveDivider from './WaveDivider'
+import Script from 'next/script'
 
 type Lang = 'pl' | 'en' | 'de'
 
@@ -84,8 +85,9 @@ export default function ContactSection() {
   return (
     <section id="contact" className="relative bg-coffeeDark text-coffeeBeige pt-10 pb-8">
       <div className="absolute inset-x-0 top-0 -translate-y-full">
-        <WaveDivider top="fill-coffeeBeige" bottom="fill-coffeeDark" />
+<WaveDivider color="fill-coffeeDark" />
       </div>
+      <h2 className="sr-only">Kontakt</h2>
 
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -104,7 +106,11 @@ export default function ContactSection() {
 
           <span className="hidden md:block h-6 w-px bg-white/20" />
 
-          <a href="tel:+48602255050" className="inline-flex items-center gap-3 hover:opacity-90 transition">
+          <a
+            href="tel:+48602255050"
+            aria-label="Zadzwoń do kawiarni Davka pod numer +48 602 255 050"
+            className="inline-flex items-center gap-3 hover:opacity-90 transition"
+          >
             <PhoneIcon className="h-6 w-6 text-coffeeBeige/90" />
             <div>
               <div className="font-semibold">+48 602 255 050</div>
@@ -113,7 +119,11 @@ export default function ContactSection() {
 
           <span className="hidden md:block h-6 w-px bg-white/20" />
 
-          <a href="mailto:davka.nysa@gmail.com" className="inline-flex items-center gap-3 hover:opacity-90 transition">
+          <a
+            href="mailto:davka.nysa@gmail.com"
+            aria-label="Wyślij maila do kawiarni Davka davka.nysa@gmail.com"
+            className="inline-flex items-center gap-3 hover:opacity-90 transition"
+          >
             <MailIcon className="h-6 w-6 text-coffeeBeige/90" />
             <div>
               <div className="font-semibold">davka.nysa@gmail.com</div>
@@ -127,6 +137,7 @@ export default function ContactSection() {
             <a
               href="https://www.facebook.com/profile.php?id=61573148150091"
               target="_blank"
+              aria-label="Facebook kawiarni Davka"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 hover:bg-white/10 transition"
             >
@@ -134,8 +145,9 @@ export default function ContactSection() {
               <span className="hidden sm:inline">{t.fb}</span>
             </a>
             <a
-              href="https://www.instagram.com/davka.nysa?utm_source=ig_web_button_share_sheet&igsh=MWhxMW5uanlzYWlmOQ=="
+              href="https://www.instagram.com/davka.nysa/"
               target="_blank"
+              aria-label="Instagram kawiarni Davka"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 hover:bg-white/10 transition"
             >
@@ -146,57 +158,96 @@ export default function ContactSection() {
         </div>
 
         <div className="mt-6 border-t border-white/15 pt-4">
-          <div className="md:hidden flex flex-col gap-3">
-            <div className="flex items-start gap-2 text-sm opacity-80">
-              <ClockIcon className="h-5 w-5 mt-0.5" />
-              <ul className="space-y-1.5">
-                <li>{t.hours.monfri}</li>
-                <li>{t.hours.sat}</li>
-                <li>{t.hours.sun}</li>
-              </ul>
-            </div>
+<div className="md:hidden flex flex-col gap-3">
+  <div className="flex items-start gap-2 text-sm opacity-80">
+  <ClockIcon className="h-5 w-5 mt-0.5" />
+    <ul
+      className="space-y-1.5 leading-relaxed"
+      itemScope
+      itemType="https://schema.org/OpeningHoursSpecification"
+    >
+      <li itemProp="dayOfWeek" content="Monday Tuesday Wednesday Thursday Friday">
+        <meta itemProp="opens" content="10:00" />
+        <meta itemProp="closes" content="20:00" />
+        {t.hours.monfri}
+      </li>
+      <li itemProp="dayOfWeek" content="Saturday">
+        <meta itemProp="opens" content="10:00" />
+        <meta itemProp="closes" content="21:00" />
+        {t.hours.sat}
+      </li>
+      <li itemProp="dayOfWeek" content="Sunday">
+        <meta itemProp="opens" content="11:00" />
+        <meta itemProp="closes" content="20:00" />
+        {t.hours.sun}
+      </li>
+    </ul>
+  </div>
 
-            <div className="mt-3 text-center space-y-1">
-              <div className="text-xs opacity-60">© 2025 DaVka.</div>
-              <div className="text-xs opacity-60">
-                Made by{' '}
-                <button
-                  type="button"
-                  onClick={copyEmail}
-                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' ? (e.preventDefault(), copyEmail()) : null)}
-                  className="underline hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
-                >
-                  Julia Winiarska
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <div className="hidden md:flex md:items-center md:justify-between">
-            <div className="text-sm opacity-80 inline-flex items-center gap-2">
-              <ClockIcon className="h-5 w-5" />
-              <div className="flex flex-wrap items-center gap-6">
-                <span>{t.hours.monfri}</span>
-                <span>• {t.hours.sat}</span>
-                <span>• {t.hours.sun}</span>
-              </div>
-            </div>
-          </div>
+<div className="mt-3 text-center space-y-2">
+  {/* Wiersz 1 – środek */}
+  <div className="text-xs opacity-60">© 2025 davka.</div>
 
-          <div className="hidden md:block mt-4 text-center space-y-1">
-            <div className="text-xs opacity-60">© 2025 DaVka.</div>
-            <div className="text-xs opacity-60">
-              Made by{' '}
-              <button
-                type="button"
-                onClick={copyEmail}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' ? (e.preventDefault(), copyEmail()) : null)}
-                className="underline hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
-              >
-                Julia Winiarska
-              </button>
-            </div>
-          </div>
+  {/* Wiersz 2 – lewa/prawa */}
+  <div className="flex items-center justify-between text-xs opacity-60">
+    <div>
+      Made by{" "}
+      <button
+        type="button"
+        onClick={copyEmail}
+        onKeyDown={(e) =>
+          e.key === "Enter" || e.key === " "
+            ? (e.preventDefault(), copyEmail())
+            : null
+        }
+        className="font-bold hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
+      >
+        Julia Winiarska
+      </button>
+    </div>
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new Event("open-cookie-prefs"))}
+      className="hover:opacity-90 transition focus:outline-none"
+    >
+      Ustawienia cookies
+    </button>
+  </div>
+</div>
+</div>
+
+<div className="hidden md:flex md:flex-col mt-4 text-xs opacity-60 space-y-2">
+  {/* Wiersz 1 – środek */}
+  <div className="text-center">© 2025 davka.</div>
+
+  {/* Wiersz 2 – lewa/prawa */}
+  <div className="flex items-center justify-between">
+    <div>
+      Made by{" "}
+      <button
+        type="button"
+        onClick={copyEmail}
+        onKeyDown={(e) =>
+          e.key === "Enter" || e.key === " "
+            ? (e.preventDefault(), copyEmail())
+            : null
+        }
+        className="font-bold hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-white/40 rounded-sm"
+      >
+        Julia Winiarska
+      </button>
+    </div>
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new Event("open-cookie-prefs"))}
+      className="hover:opacity-90 transition focus:outline-none"
+    >
+      Ustawienia cookies
+    </button>
+  </div>
+</div>
+
         </div>
       </div>
 
@@ -208,11 +259,59 @@ export default function ContactSection() {
           copied ? 'opacity-100' : 'opacity-0',
         ].join(' ')}
       >
-<span className="px-3 py-1 rounded-full text-[11px] bg-black/75 text-white shadow">
-  {t.copiedMsg}
-</span>
-
+        <span className="px-3 py-1 rounded-full text-[11px] bg-black/75 text-white shadow">
+          {t.copiedMsg}
+        </span>
       </div>
+
+      {/* JSON-LD schema.org dla SEO */}
+      <Script id="opening-hours" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CafeOrCoffeeShop",
+          "name": "davka.",
+          "image": "https://davkacafe.pl/logo.png",
+          "url": "https://davkacafe.pl",
+          "telephone": "+48 602 255 050",
+          "email": "davka.nysa@gmail.com",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Rynek 32",
+            "addressLocality": "Nysa",
+            "postalCode": "48-300",
+            "addressCountry": "PL"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 50.47430334446845,
+            "longitude": 17.332278660783693
+          },
+          "sameAs": [
+            "https://www.facebook.com/profile.php?id=61573148150091",
+            "https://www.instagram.com/davka.nysa/"
+          ],
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+              "opens": "10:00",
+              "closes": "20:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": "Saturday",
+              "opens": "10:00",
+              "closes": "21:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": "Sunday",
+              "opens": "11:00",
+              "closes": "20:00"
+            }
+          ]
+        })}
+      </Script>
     </section>
   )
 }

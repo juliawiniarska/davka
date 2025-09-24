@@ -1,13 +1,12 @@
 type Props = {
   flip?: boolean
-  top?: string
-  bottom?: string
+  color?: string // zamiast top/bottom wystarczy jeden kolor
   className?: string
 }
 
 export default function WaveDivider({
   flip,
-  top = 'fill-coffeeTan',
+  color = 'fill-coffeeDark',
   className = '',
 }: Props) {
   return (
@@ -22,14 +21,13 @@ export default function WaveDivider({
             M0,192
             C240,160 480,224 720,192
             C960,160 1200,96 1440,128
-            L1440,192
-            C1200,160 960,224 720,256
-            C480,288 240,224 0,256
+            L1440,320
+            L0,320
             Z
           "
-          className={top}
+          className={color}
         />
       </svg>
     </div>
-  );
+  )
 }

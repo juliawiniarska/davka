@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import WaveDivider from './WaveDivider'
+import WaveDivider3 from './WaveDivider3'
 
 type Img = { id: string; url: string; width: number; height: number }
 type Payload = { status: 'ok'|'empty'|'closed'|'error'; images: Img[] }
@@ -303,21 +303,35 @@ const startPauseCycle = () => {
 <section
   id="daily"
   className="relative text-coffeeDark pt-2 isolate overflow-x-hidden"
-  style={{ paddingBottom: WAVE_PX + 8 }}
+   style={{
+    paddingTop: isMobile() ? 0 : 8, 
+    paddingBottom: isMobile() ? WAVE_PX / 2 : WAVE_PX + 8,
+  }}
 >
 
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 -z-10"
-style={{
-  height: `calc(100% - ${WAVE_PX}px)`,
-  backgroundImage: 'url(/back1.png)',
-  backgroundSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 'cover' : '100% 100%',
-  backgroundPosition: typeof window !== 'undefined' && window.innerWidth < 768 ? 'center top' : 'top center',
-  backgroundRepeat: 'no-repeat',
-}}
+<div
+  aria-hidden
+  className="absolute inset-x-0 top-0 -z-10"
+  style={{
+    height: `calc(100% - ${WAVE_PX}px)`,
+    backgroundImage:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'url(/backm2.png)'   // mobile
+        : 'url(/back2.png)',  // desktop
+    backgroundSize:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'cover'
+        : '100% 100%',
+    backgroundPosition:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'center top'
+        : 'top center',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor: '#f4e6c9',
+  }}
+/>
 
-        />
+
 <TitlePaper title={t.title} subtitle={t[subtitleKey]} />
 
         <div className="relative mx-auto max-w-6xl px-6 z-10">
@@ -342,7 +356,7 @@ style={{
                       >
                         <Image
                           src={img.url}
-                          alt=""
+                          alt="Witryna dnia kawiarni Davka – świeże wypieki, kawa specialty, matcha i desery"
                           fill
                           quality={100}
                           sizes="25vw"
@@ -366,9 +380,10 @@ style={{
           </div>
         </div>
 
-        <div className="pointer-events-none absolute left-1/2 bottom-0 -translate-x-1/2 w-screen z-0">
-          <WaveDivider flip />
-        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-[#f4e6c9]">
+  <WaveDivider3 flip className="w-full" />
+</div>
+
       </section>
     )
   }
@@ -379,18 +394,30 @@ style={{
       className="relative text-coffeeDark pt-2 isolate"
       style={{ paddingBottom: WAVE_PX + 8 }}
     >
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10"
-style={{
-  height: `calc(100% - ${WAVE_PX}px)`,
-  backgroundImage: 'url(/back1.png)',
-  backgroundSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 'cover' : '100% 100%',
-  backgroundPosition: typeof window !== 'undefined' && window.innerWidth < 768 ? 'center top' : 'top center',
-  backgroundRepeat: 'no-repeat',
-}}
+<div
+  aria-hidden
+  className="absolute inset-x-0 top-0 -z-10"
+  style={{
+    height: `calc(100% - ${WAVE_PX}px)`,
+    backgroundImage:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'url(/backm2.png)'   // mobile
+        : 'url(/back2.png)',  // desktop
+    backgroundSize:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'cover'
+        : '100% 100%',
+    backgroundPosition:
+      typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'center top'
+        : 'top center',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor: '#f4e6c9',
+  }}
+/>
 
-      />
+
+
 
       <TitlePaper title={t.title} subtitle={t.subtitle} />
 
@@ -425,7 +452,7 @@ style={{
                     >
                       <Image
                         src={img.url}
-                        alt=""
+                          alt="Witryna dnia kawiarni Davka – świeże wypieki, kawa specialty, matcha i desery"
                         fill
                         quality={100}
 sizes="100vw md:25vw"
@@ -446,9 +473,10 @@ sizes="100vw md:25vw"
         </div>
       </div>
 
-<div className="pointer-events-none absolute inset-x-0 bottom-0 z-0">
-  <WaveDivider flip className="w-full" />
+<div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-[#f4e6c9]">
+  <WaveDivider3 flip className="w-full" />
 </div>
+
 
     </section>
   )
@@ -457,12 +485,18 @@ sizes="100vw md:25vw"
 function TitlePaper({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="relative mx-auto w-90 max-w-4xl text-center mb-4">
-      <h3
+      <h2
         className="text-3xl md:text-5xl font-black tracking-wide"
         style={{ fontFamily: "'Londrina Shadow', serif" }}
       >
         {title}
-      </h3>
+      </h2>
+
+      <div className="sr-only">
+  Nasza codzienna witryna obejmuje kawę specialty, matchę, lody rzemieślnicze,
+  świeże śniadania, domowe ciasta, drinki, piwo Peroni oraz wino.
+</div>
+
       {subtitle && (
         <p className="mt-3 md:mt-4 text-xs md:text-sm opacity-80 font-sans">
           {subtitle.split('davka.nysa').map((part, idx, arr) => (
@@ -470,10 +504,12 @@ function TitlePaper({ title, subtitle }: { title: string; subtitle?: string }) {
               {part}
               {idx < arr.length - 1 && (
                 <a
-                  href="https://www.instagram.com/davka.nysa/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold hover:opacity-80 transition"
+href="https://www.instagram.com/davka.nysa/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="font-bold hover:opacity-80 transition"
+  aria-label="Instagram kawiarni Davka"
+  title="Instagram kawiarni Davka"
                 >
                   davka.nysa
                 </a>

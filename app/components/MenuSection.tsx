@@ -7,9 +7,10 @@ import WaveDivider2 from './WaveDivider2'
 type MenuImg = { src: string; alt: string }
 
 const menuImages: MenuImg[] = [
-  { src: '/menu1.png', alt: 'Menu – strona 1' },
-  { src: '/menu2.png', alt: 'Menu – strona 2' },
+  { src: '/menu1.png', alt: 'Menu kawiarni Davka – kawa specialty, matcha, śniadania i lody rzemieślnicze' },
+  { src: '/menu2.png', alt: 'Menu kawiarni Davka – domowe słodkości, drinki, piwo Peroni, wino' },
 ]
+
 
 export default function MenuSection() {
   const [open, setOpen] = useState(false)
@@ -36,7 +37,7 @@ export default function MenuSection() {
   return (
 <section
   id="menu"
-  className="relative bg-coffeeBeige text-coffeeDark pt-0 pb-16 md:pb-24 overflow-hidden"
+  className="relative bg-coffeeBeige text-coffeeDark pt-0 pb-28 md:pb-24 overflow-hidden"
 >
       <h2
         className="text-3xl md:text-5xl font-black tracking-wide text-center mb-10"
@@ -44,6 +45,13 @@ export default function MenuSection() {
       >
         MENU
       </h2>
+      <h3 className="sr-only">Oferta kawiarni Davka – kawa, matcha, lody, śniadania, drinki</h3>
+
+      <div className="sr-only">
+  Menu kawiarni Davka obejmuje: kawa specialty, matcha, lody rzemieślnicze, śniadania,
+  domowe słodkości, drinki, piwo Peroni oraz wino.
+</div>
+
 
       <div className="relative mx-auto max-w-6xl px-4">
 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6 items-center justify-items-center">

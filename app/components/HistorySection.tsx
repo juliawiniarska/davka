@@ -167,7 +167,7 @@ export default function HistorySection() {
     <div className="overflow-hidden rounded-2xl h-[420px] md:h-[440px]">
       <Image
         src="/d5.jpg"
-        alt="davka right top"
+  alt="Kawiarnia Davka w Nysie – kawa specialty, matcha i lody rzemieślnicze"
         width={1400}
         height={900}
         className="w-full h-full object-cover object-center scale-[0.9] md:scale-100 rounded-2xl"
@@ -184,7 +184,7 @@ export default function HistorySection() {
     <div className="overflow-hidden rounded-2xl h-[420px] md:h-[440px]">
       <Image
         src="/d15.jpg"
-        alt="davka left below"
+  alt="Śniadania i domowe wypieki w kawiarni Davka, Rynek 32 Nysa"
         width={900}
         height={900}
         className="w-full h-full object-cover object-center scale-[0.9] md:scale-100 rounded-2xl"
@@ -206,7 +206,7 @@ export default function HistorySection() {
     <div className="overflow-hidden rounded-2xl h-full">
       <Image
         src="/d8.jpg"
-        alt="davka right below"
+  alt="Drinki i piwo Peroni serwowane w kawiarni Davka Nysa"
         width={700}
         height={900}
         className="w-full h-full object-cover object-center rounded-2xl"
@@ -222,7 +222,7 @@ export default function HistorySection() {
   <div className="relative w-screen overflow-hidden">
     <Image
       src="/d12.jpg"
-      alt="davka interior"
+  alt="Wnętrze kawiarni Davka Nysa – klimatyczne miejsce z winem i słodkościami"
       width={2400}
       height={1200}
       className="w-screen h-[360px] md:h-[520px] object-cover object-center "
