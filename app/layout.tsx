@@ -29,6 +29,7 @@ export const metadata = {
     "ciasta Nysa",
     "davka kawiarnia",
   ],
+  manifest: "/site.webmanifest",
   openGraph: {
     title: "davka.",
     description:
@@ -37,19 +38,23 @@ export const metadata = {
     siteName: "davka.",
     images: [
       {
-        url: "/logo.png",
-        width: 192,
-        height: 192,
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
         alt: "davka. kawiarnia w Nysie",
       },
     ],
     locale: "pl_PL",
     type: "website",
   },
-icons: {
-    icon: "/logo-50x50.png",       
-    shortcut: "/logo-50x50.png",
-    apple: "/logo-225x225.png",    
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" }
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
   },
 };
 
@@ -58,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pl" className={poppins.variable}>
       <body className="font-poppins bg-white text-gray-900">
         {children}
-         <CookieBanner />
+        <CookieBanner />
       </body>
     </html>
   );
